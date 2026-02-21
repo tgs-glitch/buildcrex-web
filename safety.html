@@ -231,6 +231,371 @@
         .lang-toggle button:hover:not(.active) {
             color: var(--gold);
         }
+
+        /* ===== AI SAFETY COPILOT CHAT WIDGET STYLES ===== */
+        .safety-copilot-widget {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1000;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .safety-copilot-button {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold) 0%, #E6C200 100%);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .safety-copilot-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .safety-copilot-button i {
+            font-size: 28px;
+            color: var(--navy-blue);
+        }
+
+        .safety-copilot-button .notification-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 20px;
+            height: 20px;
+            background: #EF4444;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+            display: none;
+        }
+
+        .safety-copilot-chat {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 380px;
+            max-width: calc(100vw - 48px);
+            height: 520px;
+            max-height: calc(100vh - 120px);
+            background: linear-gradient(145deg, var(--navy-light) 0%, var(--navy-blue) 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.3s ease;
+        }
+
+        .safety-copilot-chat.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .safety-copilot-header {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, rgba(26, 39, 68, 0.9) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .safety-copilot-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .safety-copilot-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold) 0%, #E6C200 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .safety-copilot-avatar i {
+            font-size: 20px;
+            color: var(--navy-blue);
+        }
+
+        .safety-copilot-title h4 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gold);
+            margin: 0;
+        }
+
+        .safety-copilot-title p {
+            font-size: 12px;
+            color: #94a3b8;
+            margin: 2px 0 0 0;
+        }
+
+        .safety-copilot-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10B981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .safety-copilot-close {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            transition: color 0.3s ease;
+        }
+
+        .safety-copilot-close:hover {
+            color: var(--gold);
+        }
+
+        .safety-copilot-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .safety-copilot-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .safety-copilot-messages::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 3px;
+        }
+
+        .safety-copilot-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 3px;
+        }
+
+        .safety-copilot-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 215, 0, 0.5);
+        }
+
+        .chat-message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .chat-message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--gold) 0%, #E6C200 100%);
+            color: var(--navy-blue);
+            border-bottom-right-radius: 4px;
+        }
+
+        .chat-message.assistant {
+            align-self: flex-start;
+            background: rgba(15, 23, 42, 0.8);
+            color: var(--white);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-message.typing {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .chat-message-time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 6px;
+            display: block;
+        }
+
+        .safety-copilot-input-area {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 16px;
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .safety-copilot-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .safety-copilot-input {
+            flex: 1;
+            background: rgba(36, 54, 86, 0.8);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: var(--white);
+            font-size: 14px;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+            font-family: inherit;
+        }
+
+        .safety-copilot-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.15);
+        }
+
+        .safety-copilot-input::placeholder {
+            color: #64748b;
+        }
+
+        .safety-copilot-send {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--gold) 0%, #E6C200 100%);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .safety-copilot-send:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .safety-copilot-send:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .safety-copilot-send i {
+            font-size: 18px;
+            color: var(--navy-blue);
+        }
+
+        .safety-copilot-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .suggestion-chip {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 12px;
+            color: var(--gold);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-chip:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: var(--gold);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+            .safety-copilot-widget {
+                bottom: 16px;
+                right: 16px;
+            }
+
+            .safety-copilot-button {
+                width: 56px;
+                height: 56px;
+            }
+
+            .safety-copilot-button i {
+                font-size: 24px;
+            }
+
+            .safety-copilot-chat {
+                position: fixed;
+                bottom: 80px;
+                right: 16px;
+                left: 16px;
+                width: auto;
+                max-width: none;
+                height: calc(100vh - 120px);
+                max-height: 500px;
+            }
+        }
+
+        /* Print styles - hide chat widget when printing */
+        @media print {
+            .safety-copilot-widget {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -584,6 +949,77 @@
             </p>
         </div>
     </footer>
+
+    <!-- ===== AI SAFETY COPILOT CHAT WIDGET ===== -->
+    <div class="safety-copilot-widget" id="safetyCopilotWidget">
+        <!-- Floating Toggle Button -->
+        <button class="safety-copilot-button" id="safetyCopilotToggle" onclick="toggleSafetyCopilot()" aria-label="Open Safety Copilot">
+            <i class="fas fa-robot"></i>
+            <span class="notification-badge" id="copilotBadge">1</span>
+        </button>
+
+        <!-- Chat Window -->
+        <div class="safety-copilot-chat" id="safetyCopilotChat">
+            <!-- Header -->
+            <div class="safety-copilot-header">
+                <div class="safety-copilot-header-left">
+                    <div class="safety-copilot-avatar">
+                        <i class="fas fa-hard-hat"></i>
+                    </div>
+                    <div class="safety-copilot-title">
+                        <h4>Safety Copilot</h4>
+                        <div class="safety-copilot-status">
+                            <span class="status-dot"></span>
+                            <p>Online</p>
+                        </div>
+                    </div>
+                </div>
+                <button class="safety-copilot-close" onclick="toggleSafetyCopilot()" aria-label="Close chat">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="safety-copilot-messages" id="copilotMessages">
+                <!-- Welcome Message -->
+                <div class="chat-message assistant">
+                    <p>Hello! I'm your AI Safety Copilot. I can help you with:</p>
+                    <ul style="margin: 8px 0; padding-left: 16px;">
+                        <li>Quebec Safety Code questions</li>
+                        <li>PPE requirements</li>
+                        <li>Risk assessment guidance</li>
+                        <li>Emergency procedures</li>
+                    </ul>
+                    <p>How can I assist you today?</p>
+                    <span class="chat-message-time" id="welcomeTime"></span>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="safety-copilot-input-area">
+                <div class="safety-copilot-input-wrapper">
+                    <textarea 
+                        class="safety-copilot-input" 
+                        id="copilotInput" 
+                        placeholder="Ask about safety requirements..." 
+                        rows="1"
+                        onkeydown="handleCopilotKeyDown(event)"
+                        oninput="autoResizeTextarea(this)"
+                    ></textarea>
+                    <button class="safety-copilot-send" id="copilotSendBtn" onclick="sendCopilotMessage()" aria-label="Send message">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                
+                <!-- Quick Suggestions -->
+                <div class="safety-copilot-suggestions">
+                    <span class="suggestion-chip" onclick="sendQuickMessage('What PPE is required for working at height?')">PPE for height work</span>
+                    <span class="suggestion-chip" onclick="sendQuickMessage('What are the excavation safety requirements?')">Excavation safety</span>
+                    <span class="suggestion-chip" onclick="sendQuickMessage('When do I need to notify CNESST?')">CNESST notification</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="main.js"></script>
     <script src="safety.js"></script>

@@ -1070,3 +1070,288 @@ window.updateChecklistProgress = updateChecklistProgress;
 window.generateDirectives = generateDirectives;
 window.printDirectives = printDirectives;
 window.downloadDirectives = downloadDirectives;
+
+// ===== AI SAFETY COPILOT CHATBOT =====
+// Security Note: All AI API calls are handled by the backend. 
+// The frontend only communicates with the local /api/chat endpoint.
+
+const SafetyCopilot = {
+    isOpen: false,
+    isTyping: false,
+    messages: [],
+    
+    // Initialize the copilot
+    init() {
+        this.setWelcomeTime();
+        this.loadChatHistory();
+    },
+    
+    // Set welcome message timestamp
+    setWelcomeTime() {
+        const timeEl = document.getElementById('welcomeTime');
+        if (timeEl) {
+            timeEl.textContent = this.formatTime(new Date());
+        }
+    },
+    
+    // Format time for message timestamps
+    formatTime(date) {
+        return date.toLocaleTimeString(currentLanguage === 'fr' ? 'fr-CA' : 'en-CA', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    },
+    
+    // Toggle chat window visibility
+    toggle() {
+        const chat = document.getElementById('safetyCopilotChat');
+        const widget = document.getElementById('safetyCopilotWidget');
+        
+        this.isOpen = !this.isOpen;
+        
+        if (this.isOpen) {
+            chat.classList.add('active');
+            widget.classList.add('active');
+            this.hideBadge();
+            setTimeout(() => {
+                document.getElementById('copilotInput').focus();
+            }, 100);
+        } else {
+            chat.classList.remove('active');
+            widget.classList.remove('active');
+        }
+        
+        this.saveChatHistory();
+    },
+    
+    // Show notification badge
+    showBadge() {
+        const badge = document.getElementById('copilotBadge');
+        if (badge && !this.isOpen) {
+            badge.style.display = 'flex';
+        }
+    },
+    
+    // Hide notification badge
+    hideBadge() {
+        const badge = document.getElementById('copilotBadge');
+        if (badge) {
+            badge.style.display = 'none';
+        }
+    },
+    
+    // Send message to backend API
+    async sendMessage(message) {
+        if (!message.trim() || this.isTyping) return;
+        
+        // Add user message to UI
+        this.addMessage(message, 'user');
+        
+        // Clear input
+        const input = document.getElementById('copilotInput');
+        input.value = '';
+        input.style.height = 'auto';
+        
+        // Show typing indicator
+        this.showTypingIndicator();
+        
+        try {
+            // Send request to backend endpoint
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message.trim() })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            // Remove typing indicator and add AI response
+            this.hideTypingIndicator();
+            this.addMessage(data.response || data.message || 'I apologize, but I was unable to process your request.', 'assistant');
+            
+        } catch (error) {
+            console.error('Safety Copilot Error:', error);
+            this.hideTypingIndicator();
+            this.addMessage(
+                'I apologize, but I am currently unable to connect to the safety assistant. Please try again later or contact support if the issue persists.',
+                'assistant'
+            );
+        }
+        
+        this.saveChatHistory();
+    },
+    
+    // Add message to chat UI
+    addMessage(text, sender) {
+        const messagesContainer = document.getElementById('copilotMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `chat-message ${sender}`;
+        
+        const time = this.formatTime(new Date());
+        
+        // Convert newlines to <br> for display
+        const formattedText = text.replace(/\n/g, '<br>');
+        
+        messageDiv.innerHTML = `
+            <p>${formattedText}</p>
+            <span class="chat-message-time">${time}</span>
+        `;
+        
+        messagesContainer.appendChild(messageDiv);
+        this.scrollToBottom();
+        
+        // Store message
+        this.messages.push({
+            text,
+            sender,
+            timestamp: new Date().toISOString()
+        });
+    },
+    
+    // Show typing indicator
+    showTypingIndicator() {
+        this.isTyping = true;
+        const messagesContainer = document.getElementById('copilotMessages');
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'chat-message assistant typing';
+        typingDiv.id = 'typingIndicator';
+        
+        typingDiv.innerHTML = `
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <span style="font-size: 12px; color: #94a3b8;">AI is typing...</span>
+        `;
+        
+        messagesContainer.appendChild(typingDiv);
+        this.scrollToBottom();
+        
+        // Disable send button
+        document.getElementById('copilotSendBtn').disabled = true;
+    },
+    
+    // Hide typing indicator
+    hideTypingIndicator() {
+        this.isTyping = false;
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
+        
+        // Enable send button
+        document.getElementById('copilotSendBtn').disabled = false;
+    },
+    
+    // Scroll messages to bottom
+    scrollToBottom() {
+        const messagesContainer = document.getElementById('copilotMessages');
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    },
+    
+    // Send quick message from suggestion chip
+    sendQuickMessage(message) {
+        this.sendMessage(message);
+    },
+    
+    // Handle keyboard input
+    handleKeyDown(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            const input = document.getElementById('copilotInput');
+            this.sendMessage(input.value);
+        }
+    },
+    
+    // Auto-resize textarea
+    autoResize(textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    },
+    
+    // Save chat history to localStorage
+    saveChatHistory() {
+        try {
+            localStorage.setItem('safetyCopilotHistory', JSON.stringify({
+                messages: this.messages,
+                lastOpen: new Date().toISOString()
+            }));
+        } catch (e) {
+            console.warn('Could not save chat history:', e);
+        }
+    },
+    
+    // Load chat history from localStorage
+    loadChatHistory() {
+        try {
+            const history = localStorage.getItem('safetyCopilotHistory');
+            if (history) {
+                const data = JSON.parse(history);
+                // Only load messages from today
+                const lastOpen = new Date(data.lastOpen);
+                const today = new Date();
+                if (lastOpen.toDateString() === today.toDateString() && data.messages) {
+                    // Restore messages (skip welcome message as it's already in HTML)
+                    data.messages.slice(0, -1).forEach(msg => {
+                        // Don't duplicate the welcome message
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn('Could not load chat history:', e);
+        }
+    },
+    
+    // Clear chat history
+    clearHistory() {
+        this.messages = [];
+        localStorage.removeItem('safetyCopilotHistory');
+    }
+};
+
+// ===== GLOBAL FUNCTIONS FOR CHAT WIDGET =====
+
+// Toggle chat window
+function toggleSafetyCopilot() {
+    SafetyCopilot.toggle();
+}
+
+// Send message from input
+function sendCopilotMessage() {
+    const input = document.getElementById('copilotInput');
+    SafetyCopilot.sendMessage(input.value);
+}
+
+// Send quick message from suggestion
+function sendQuickMessage(message) {
+    SafetyCopilot.sendQuickMessage(message);
+}
+
+// Handle keyboard events
+function handleCopilotKeyDown(event) {
+    SafetyCopilot.handleKeyDown(event);
+}
+
+// Auto-resize textarea
+function autoResizeTextarea(textarea) {
+    SafetyCopilot.autoResize(textarea);
+}
+
+// Initialize copilot on page load
+document.addEventListener('DOMContentLoaded', function() {
+    SafetyCopilot.init();
+});
+
+// Export for global access
+window.toggleSafetyCopilot = toggleSafetyCopilot;
+window.sendCopilotMessage = sendCopilotMessage;
+window.sendQuickMessage = sendQuickMessage;
+window.handleCopilotKeyDown = handleCopilotKeyDown;
+window.autoResizeTextarea = autoResizeTextarea;
