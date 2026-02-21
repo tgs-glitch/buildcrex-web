@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="hero_title_1">BuildCrex - Build Safer. Build Faster.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --navy-blue: #1a2744;
+            --navy-dark: #0f172a;
+            --navy-light: #243656;
+            --gold: #FFD700;
+            --gold-light: #FFE55C;
+            --white: #FFFFFF;
+            --gray-light: #E5E5E5;
+            --gray-dark: #94a3b8;
+        }
+        
+        body {
+            background-color: var(--navy-blue);
+            color: var(--white);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(26, 39, 68, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%), 
+                        url('./resources/hero-bg.jpg') center/cover no-repeat;
+            min-height: 100vh;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold) 0%, #E6C200 100%);
+            color: var(--navy-blue);
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--gold);
+            color: var(--navy-blue);
+        }
+        
+        .card {
+            background: linear-gradient(145deg, var(--navy-light) 0%, rgba(36, 54, 86, 0.8) 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.95);
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(145deg, var(--navy-light) 0%, var(--navy-blue) 100%);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid var(--gold);
+        }
+        
+        .form-input {
+            background-color: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--white);
+            border-radius: 10px;
+            padding: 14px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.15);
+        }
+        
+        .nav-link {
+            color: var(--gray-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            color: var(--gold);
+        }
+        
+        .feature-icon {
+            color: var(--gold);
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .gold-text {
+            color: var(--gold);
+        }
+        
+        .logo-container img {
+            height: 50px;
+            width: auto;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+            margin: 4rem 0;
+        }
+        
+        /* Language Toggle Styles */
+        .lang-toggle {
+            display: flex;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 25px;
+            padding: 4px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .lang-toggle button {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            color: #94a3b8;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .lang-toggle button.active {
+            background: linear-gradient(135deg, var(--gold) 0%, #E6C200 100%);
+            color: var(--navy-blue);
+        }
+        
+        .lang-toggle button:hover:not(.active) {
+            color: var(--gold);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-[#0f172a]/95 backdrop-blur-md border-b border-[#FFD700]/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center logo-container">
+                    <img src="./resources/buildcrex-logo.jpg" alt="BuildCrex Logo" class="h-12">
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#features" class="nav-link" data-i18n="nav_home">Home</a>
+                    <a href="safety.html" class="nav-link" data-i18n="nav_safety">Safety Analysis</a>
+                    <a href="marketplace.html" class="nav-link" data-i18n="nav_marketplace">Marketplace</a>
+                    <a href="dashboard.html" class="nav-link" data-i18n="nav_dashboard">Dashboard</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Language Toggle -->
+                    <div class="lang-toggle">
+                        <button id="langToggleEn" class="active" onclick="toggleLanguage()">EN</button>
+                        <button id="langToggleFr" onclick="toggleLanguage()">FR</button>
+                    </div>
+                    <button onclick="openModal('loginModal')" class="btn-secondary px-6 py-2.5 rounded-lg" data-i18n="nav_login">
+                        Login
+                    </button>
+                    <button onclick="openModal('signupModal')" class="btn-primary px-6 py-2.5 rounded-lg" data-i18n="nav_signup">
+                        Sign Up
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg flex items-center justify-center relative pt-20">
+        <div class="text-center max-w-5xl mx-auto px-4">
+            <div class="mb-8">
+                <img src="./resources/buildcrex-logo.jpg" alt="BuildCrex" class="h-32 mx-auto mb-8 rounded-xl shadow-2xl">
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                <span data-i18n="hero_title_1" class="gradient-text">Build Safer.</span><br>
+                <span data-i18n="hero_title_2" class="gradient-text">Build Faster.</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-10 text-gray-300 max-w-3xl mx-auto" data-i18n="hero_subtitle">
+                Canada's premier construction compliance and procurement marketplace. 
+                Connect, verify, and build with confidence using Quebec Safety Code compliance.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="openModal('signupModal')" class="btn-primary px-10 py-4 rounded-xl text-lg" data-i18n="hero_cta_start">
+                    Get Started Today
+                </button>
+                <button onclick="scrollToFeatures()" class="btn-secondary px-10 py-4 rounded-xl text-lg" data-i18n="hero_cta_learn">
+                    Learn More
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 px-4">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold text-center mb-4">
+                <span data-i18n="features_title">Why Choose</span> <span class="gradient-text">BuildCrex</span>
+            </h2>
+            <p class="text-center text-gray-400 mb-16 max-w-2xl mx-auto" data-i18n="features_subtitle">
+                Comprehensive construction management with Quebec Safety Code compliance built-in
+            </p>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card p-8 text-center">
+                    <i class="fas fa-shield-alt feature-icon"></i>
+                    <h3 class="text-2xl font-bold mb-4" data-i18n="feature_compliance_title">Compliance Verification</h3>
+                    <p class="text-gray-300" data-i18n="feature_compliance_desc">
+                        Automated verification of Red Seal, RBQ, WSIB, and Insurance certifications 
+                        through government database integration.
+                    </p>
+                </div>
+                <div class="card p-8 text-center">
+                    <i class="fas fa-hard-hat feature-icon"></i>
+                    <h3 class="text-2xl font-bold mb-4" data-i18n="feature_safety_title">Safety Code Analysis</h3>
+                    <p class="text-gray-300" data-i18n="feature_safety_desc">
+                        Pre-operations safety directives based on Quebec Safety Code S-2.1, r. 4. 
+                        Automated risk assessment for every project.
+                    </p>
+                </div>
+                <div class="card p-8 text-center">
+                    <i class="fas fa-handshake feature-icon"></i>
+                    <h3 class="text-2xl font-bold mb-4" data-i18n="feature_escrow_title">SafePay Escrow</h3>
+                    <p class="text-gray-300" data-i18n="feature_escrow_desc">
+                        Secure payment processing with milestone-based fund release. 
+                        Protect both project owners and contractors.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 mt-8">
+                <div class="card p-8 text-center">
+                    <i class="fas fa-clipboard-check feature-icon"></i>
+                    <h3 class="text-2xl font-bold mb-4" data-i18n="feature_preops_title">Pre-Ops Safety</h3>
+                    <p class="text-gray-300" data-i18n="feature_preops_desc">
+                        Generate comprehensive safety checklists and directives 
+                        before starting any construction project.
+                    </p>
+                </div>
+                <div class="card p-8 text-center">
+                    <i class="fas fa-leaf feature-icon"></i>
+                    <h3 class="text-2xl font-bold mb-4" data-i18n="feature_green_title">Green Rebates</h3>
+                    <p class="text-gray-300" data-i18n="feature_green_desc">
+                        Access eco-eligible materials and track green building compliance 
+                        for government rebate programs.
+                    </p>
+                </div>
+                <div class="card p-8 text-center">
+                    <i class="fas fa-store feature-icon"></i>
+                    <h3 class="text-2xl font-bold mb-4" data-i18n="feature_marketplace_title">Material Marketplace</h3>
+                    <p class="text-gray-300" data-i18n="feature_marketplace_desc">
+                        Browse and purchase construction materials with competitive pricing 
+                        and verified suppliers.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-4xl mx-auto"></div>
+
+    <!-- Safety Feature Highlight -->
+    <section class="py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold mb-6">
+                        <span data-i18n="safety_title">Quebec Safety Code</span> <span class="gradient-text">Compliance</span>
+                    </h2>
+                    <p class="text-lg text-gray-300 mb-6" data-i18n="safety_subtitle">
+                        BuildCrex integrates the latest Quebec Safety Code for Construction Industry (S-2.1, r. 4) 
+                        to ensure every project meets regulatory requirements before work begins.
+                    </p>
+                    <ul class="space-y-4 text-gray-300">
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-[#FFD700] mt-1 mr-3"></i>
+                            <span data-i18n="safety_feature_1">Automated safety directive generation based on project type</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-[#FFD700] mt-1 mr-3"></i>
+                            <span data-i18n="safety_feature_2">Pre-operations risk assessment and checklist creation</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-[#FFD700] mt-1 mr-3"></i>
+                            <span data-i18n="safety_feature_3">Compliance tracking for high-risk construction sites</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check-circle text-[#FFD700] mt-1 mr-3"></i>
+                            <span data-i18n="safety_feature_4">PPE requirements and fall protection guidelines</span>
+                        </li>
+                    </ul>
+                    <a href="safety.html" class="btn-primary inline-block mt-8 px-8 py-3 rounded-lg" data-i18n="safety_cta">
+                        Try Safety Analysis
+                    </a>
+                </div>
+                <div class="card p-8">
+                    <h3 class="text-2xl font-bold mb-6 text-center" data-i18n="safety_analysis_title">Safety Analysis Features</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center p-4 bg-[#0f172a]/50 rounded-lg">
+                            <i class="fas fa-exclamation-triangle text-[#FFD700] text-2xl mr-4"></i>
+                            <div>
+                                <p class="font-semibold">Risk Assessment</p>
+                                <p class="text-sm text-gray-400">Identify hazards before work begins</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-4 bg-[#0f172a]/50 rounded-lg">
+                            <i class="fas fa-clipboard-list text-[#FFD700] text-2xl mr-4"></i>
+                            <div>
+                                <p class="font-semibold">Safety Checklists</p>
+                                <p class="text-sm text-gray-400">Project-specific compliance checklists</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-4 bg-[#0f172a]/50 rounded-lg">
+                            <i class="fas fa-hard-hat text-[#FFD700] text-2xl mr-4"></i>
+                            <div>
+                                <p class="font-semibold">PPE Requirements</p>
+                                <p class="text-sm text-gray-400">Personal protective equipment guidelines</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-4 bg-[#0f172a]/50 rounded-lg">
+                            <i class="fas fa-file-alt text-[#FFD700] text-2xl mr-4"></i>
+                            <div>
+                                <p class="font-semibold">Documentation</p>
+                                <p class="text-sm text-gray-400">Generate compliance reports</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider max-w-4xl mx-auto"></div>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl font-bold mb-8">
+                <span data-i18n="about_title">Built for Canada's</span> <span class="gradient-text">Construction Industry</span>
+            </h2>
+            <p class="text-xl text-gray-300 mb-8" data-i18n="about_subtitle">
+                BuildCrex streamlines the entire construction workflow, from compliance verification 
+                to project completion. Our platform connects project owners with verified contractors, 
+                ensuring safety, compliance, and efficiency at every step.
+            </p>
+            <div class="grid md:grid-cols-2 gap-8 mt-12 text-left">
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold mb-4 gradient-text" data-i18n="for_contractors">For Contractors</h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-center"><i class="fas fa-check text-[#FFD700] mr-3"></i><span data-i18n="contractor_feature_1">Upload and verify certifications</span></li>
+                        <li class="flex items-center"><i class="fas fa-check text-[#FFD700] mr-3"></i><span data-i18n="contractor_feature_2">Bid on verified projects</span></li>
+                        <li class="flex items-center"><i class="fas fa-check text-[#FFD700] mr-3"></i><span data-i18n="contractor_feature_3">Access material marketplace</span></li>
+                        <li class="flex items-center"><i class="fas fa-check text-[#FFD700] mr-3"></i><span data-i18n="contractor_feature_4">Track project milestones</span></li>
+                        <li class="flex items-center"><i class="fas fa-check text-[#FFD700] mr-3"></i><span data-i18n="contractor_feature_5">Receive safety directives</span></li>
+                    </ul>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-2xl font-bold mb-4 gradient-text" data-i18n="for_owners">For Project Owners</h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-center"><i class="fas fa-check text-[#FFD700] mr-3"></i><span data-i18n="owner_feature_1">Post projects and receive bids</span></li>
+                        <li class="flex items-center"><i class="fas fa-check text-[#FFD700] mr-3"></i><span data-i18n="owner_feature_2">Verify contractor credentials</span></li>
+                        <li class="flex items-center"><i class="fas fa-check text-[#FFD700] mr-3"></i><span data-i18n="owner_feature_3">Secure escrow payments</span></li>
+                        <li class="flex items-center"><i class="fas fa-check text-[#FFD700] mr-3"></i><span data-i18n="owner_feature_4">Approve milestones and release funds</span></li>
+                        <li class="flex items-center"><i class="fas fa-check text-[#FFD700] mr-3"></i><span data-i18n="owner_feature_5">Ensure safety compliance</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#0f172a] py-12 px-4 border-t border-[#FFD700]/20">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <img src="./resources/buildcrex-logo.jpg" alt="BuildCrex" class="h-16 rounded-lg">
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="nav-link" data-i18n="footer_privacy">Privacy Policy</a>
+                    <a href="#" class="nav-link" data-i18n="footer_terms">Terms of Service</a>
+                    <a href="#" class="nav-link" data-i18n="footer_contact">Contact</a>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-800 text-center">
+                <p class="text-gray-400" data-i18n="footer_copyright">
+                    © 2025 BuildCrex. Building Canada's future with compliance and confidence.
+                </p>
+                <p class="text-sm text-gray-500 mt-2" data-i18n="footer_compliance">
+                    Compliant with Quebec Safety Code S-2.1, r. 4 for Construction Industry
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold" data-i18n="login_title">Welcome Back</h2>
+                <button onclick="closeModal('loginModal')" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2" data-i18n="login_email">Email</label>
+                    <input type="email" class="form-input" placeholder="Enter your email" required>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2" data-i18n="login_password">Password</label>
+                    <input type="password" class="form-input" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn-primary w-full py-3 rounded-lg font-semibold" data-i18n="login_button">
+                    Login
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold" data-i18n="signup_title">Create Account</h2>
+                <button onclick="closeModal('signupModal')" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <form id="signupForm">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2" data-i18n="signup_company">Company Name</label>
+                    <input type="text" class="form-input" placeholder="Enter company name" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2" data-i18n="login_email">Email</label>
+                    <input type="email" class="form-input" placeholder="Enter your email" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2" data-i18n="signup_role">Role</label>
+                    <select class="form-input" required>
+                        <option value="" data-i18n="select_role">Select your role</option>
+                        <option value="contractor" data-i18n="signup_role_contractor">Contractor</option>
+                        <option value="owner" data-i18n="signup_role_owner">Project Owner</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2" data-i18n="login_password">Password</label>
+                    <input type="password" class="form-input" placeholder="Create a password" required>
+                </div>
+                <button type="submit" class="btn-primary w-full py-3 rounded-lg font-semibold" data-i18n="signup_button">
+                    Create Account
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>

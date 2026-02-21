@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n-title="marketplace_title">Marketplace - BuildCrex</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --navy-blue: #1a2744;
+            --navy-dark: #0f172a;
+            --navy-light: #243656;
+            --gold: #FFD700;
+            --gold-light: #FFE55C;
+            --white: #FFFFFF;
+            --success-green: #10B981;
+        }
+        
+        body {
+            background-color: var(--navy-blue);
+            color: var(--white);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold) 0%, #E6C200 100%);
+            color: var(--navy-blue);
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--gold);
+            color: var(--navy-blue);
+        }
+        
+        .card {
+            background: linear-gradient(145deg, var(--navy-light) 0%, rgba(36, 54, 86, 0.8) 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .product-card {
+            background: linear-gradient(145deg, var(--navy-light) 0%, rgba(36, 54, 86, 0.8) 100%);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 215, 0, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .eco-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-link {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .nav-link:hover {
+            color: var(--gold);
+        }
+        
+        .filter-sidebar {
+            background: linear-gradient(145deg, var(--navy-light) 0%, rgba(36, 54, 86, 0.8) 100%);
+            border-radius: 16px;
+            position: sticky;
+            top: 100px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        
+        .search-input {
+            background-color: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--white);
+            border-radius: 10px;
+            padding: 12px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.15);
+        }
+        
+        .cart-sidebar {
+            position: fixed;
+            right: -500px;
+            top: 0;
+            width: 500px;
+            height: 100vh;
+            background: linear-gradient(180deg, var(--navy-dark) 0%, var(--navy-blue) 100%);
+            border-left: 2px solid var(--gold);
+            transition: right 0.3s ease;
+            z-index: 200;
+            overflow-y: auto;
+        }
+        
+        .cart-sidebar.active {
+            right: 0;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.95);
+            z-index: 1000;
+            backdrop-filter: blur(8px);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(145deg, var(--navy-light) 0%, var(--navy-blue) 100%);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            border: 2px solid var(--gold);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Language Toggle Styles */
+        .lang-toggle {
+            display: flex;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 25px;
+            padding: 4px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .lang-toggle button {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            color: #94a3b8;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .lang-toggle button.active {
+            background: linear-gradient(135deg, var(--gold) 0%, #E6C200 100%);
+            color: var(--navy-blue);
+        }
+        
+        .lang-toggle button:hover:not(.active) {
+            color: var(--gold);
+        }
+        
+        /* Tax breakdown styles */
+        .tax-breakdown {
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .tax-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .tax-row.total {
+            border-top: 1px solid rgba(255, 215, 0, 0.3);
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-[#0f172a]/95 backdrop-blur-md border-b border-[#FFD700]/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center">
+                    <a href="index.html">
+                        <img src="./resources/buildcrex-logo.jpg" alt="BuildCrex" class="h-12 rounded-lg">
+                    </a>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="nav-link" data-i18n="nav_home">Home</a>
+                    <a href="safety.html" class="nav-link" data-i18n="nav_safety">Safety Analysis</a>
+                    <a href="dashboard.html" class="nav-link" data-i18n="nav_dashboard">Dashboard</a>
+                    <a href="marketplace.html" class="nav-link text-[#FFD700]" data-i18n="nav_marketplace">Marketplace</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Language Toggle -->
+                    <div class="lang-toggle">
+                        <button id="langToggleEn" class="active" onclick="toggleLanguage()">EN</button>
+                        <button id="langToggleFr" onclick="toggleLanguage()">FR</button>
+                    </div>
+                    <button onclick="toggleCart()" class="relative btn-primary px-5 py-2.5 rounded-lg">
+                        <i class="fas fa-shopping-cart mr-2"></i>
+                        <span data-i18n="shopping_cart">Cart</span>
+                        <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-24 px-4 max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                <span data-i18n="marketplace_title">Material</span> <span class="gradient-text">Marketplace</span>
+            </h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto" data-i18n="marketplace_subtitle">
+                Discover eco-eligible materials and construction supplies with competitive pricing
+            </p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Filter Sidebar -->
+            <div class="lg:w-1/4">
+                <div class="filter-sidebar p-6">
+                    <h3 class="text-xl font-bold mb-6 gradient-text" data-i18n="filters">Filters</h3>
+                    
+                    <!-- Search -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2" data-i18n="search_products">Search Products</label>
+                        <input type="text" class="search-input" placeholder="Search materials..." id="searchInput" oninput="filterProducts()">
+                    </div>
+                    
+                    <!-- Category Filter -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2" data-i18n="category">Category</label>
+                        <select class="search-input" id="categoryFilter" onchange="filterProducts()">
+                            <option value="" data-i18n="all_categories">All Categories</option>
+                            <option value="concrete" data-i18n="cat_concrete">Concrete & Cement</option>
+                            <option value="steel" data-i18n="cat_steel">Steel & Metal</option>
+                            <option value="wood" data-i18n="cat_wood">Wood & Lumber</option>
+                            <option value="insulation" data-i18n="cat_insulation">Insulation</option>
+                            <option value="electrical" data-i18n="cat_electrical">Electrical</option>
+                            <option value="plumbing" data-i18n="cat_plumbing">Plumbing</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Price Range -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2" data-i18n="price_range">Price Range</label>
+                        <div class="flex space-x-2">
+                            <input type="number" class="search-input" placeholder="Min" id="minPrice" oninput="filterProducts()">
+                            <input type="number" class="search-input" placeholder="Max" id="maxPrice" oninput="filterProducts()">
+                        </div>
+                    </div>
+                    
+                    <!-- Eco Filter -->
+                    <div class="mb-6">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="ecoFilter" onchange="filterProducts()" class="w-5 h-5 accent-[#FFD700]">
+                            <span data-i18n="eco_eligible_only">Eco-Eligible Only</span>
+                            <i class="fas fa-leaf text-green-500"></i>
+                        </label>
+                    </div>
+                    
+                    <!-- Stock Filter -->
+                    <div class="mb-6">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="inStockFilter" onchange="filterProducts()" checked class="w-5 h-5 accent-[#FFD700]">
+                            <span data-i18n="in_stock_only">In Stock Only</span>
+                        </label>
+                    </div>
+                    
+                    <button onclick="clearFilters()" class="btn-secondary w-full py-3 rounded-lg" data-i18n="clear_filters">
+                        Clear Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="lg:w-3/4">
+                <div class="flex justify-between items-center mb-6">
+                    <p class="text-gray-400">
+                        <span data-i18n="showing_products">Showing</span> <span id="productCount" class="text-[#FFD700] font-bold">0</span> <span data-i18n="products">products</span>
+                    </p>
+                    <select class="search-input w-auto" id="sortBy" onchange="sortProducts()">
+                        <option value="name" data-i18n="sort_name">Sort by Name</option>
+                        <option value="price-low" data-i18n="sort_price_low">Price: Low to High</option>
+                        <option value="price-high" data-i18n="sort_price_high">Price: High to Low</option>
+                        <option value="eco" data-i18n="sort_eco">Eco-Eligible First</option>
+                    </select>
+                </div>
+                
+                <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6" id="productGrid">
+                    <!-- Products will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Sidebar with Tax Breakdown -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="p-6 border-b border-[#FFD700]/30">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xl font-bold gradient-text" data-i18n="shopping_cart">Shopping Cart</h3>
+                <button onclick="toggleCart()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="p-6" style="min-height: calc(100vh - 350px);">
+            <div id="cartItems">
+                <!-- Cart items will be populated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Tax Breakdown Section -->
+        <div class="border-t border-[#FFD700]/30 p-6 bg-[#0f172a]">
+            <div class="tax-breakdown">
+                <div class="tax-row">
+                    <span class="text-gray-400" data-i18n="cart_subtotal">Subtotal</span>
+                    <span id="cartSubtotal" class="font-semibold">$0.00</span>
+                </div>
+                <div class="tax-row">
+                    <span class="text-gray-400" data-i18n="cart_gst">GST (5%)</span>
+                    <span id="cartGST" class="font-semibold">$0.00</span>
+                </div>
+                <div class="tax-row">
+                    <span class="text-gray-400" data-i18n="cart_qst">QST (9.975%)</span>
+                    <span id="cartQST" class="font-semibold">$0.00</span>
+                </div>
+                <div class="tax-row total">
+                    <span data-i18n="cart_total">Total</span>
+                    <span id="cartTotal" class="gradient-text">$0.00</span>
+                </div>
+            </div>
+            <button onclick="checkout()" class="btn-primary w-full py-3 rounded-lg font-semibold mt-4" data-i18n="proceed_checkout">
+                Proceed to Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold" id="modalProductName">Product Name</h2>
+                <button onclick="closeModal('productModal')" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="relative">
+                    <div class="h-64 bg-gradient-to-br from-[#243656] to-[#1a2744] rounded-xl flex items-center justify-center">
+                        <i class="fas fa-box text-6xl text-gray-500"></i>
+                    </div>
+                    <div id="modalEcoBadge" class="hidden absolute top-4 right-4">
+                        <span class="eco-badge">ECO-ELIGIBLE</span>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-3xl font-bold gradient-text mb-4" id="modalProductPrice">$0.00</p>
+                    <p class="text-gray-300 mb-4" id="modalProductDescription">Product description</p>
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-400">Stock Level</p>
+                        <p class="font-semibold" id="modalStockLevel">In Stock</p>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium mb-2">Quantity</label>
+                        <input type="number" class="search-input w-24" value="1" min="1" id="modalQuantity">
+                    </div>
+                    <button onclick="addToCartFromModal()" class="btn-primary w-full py-3 rounded-lg font-semibold">
+                        <i class="fas fa-cart-plus mr-2"></i><span data-i18n="add_to_cart">Add to Cart</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-[#0f172a] py-12 px-4 border-t border-[#FFD700]/20 mt-20">
+        <div class="max-w-6xl mx-auto text-center">
+            <div class="mb-8">
+                <img src="./resources/buildcrex-logo.jpg" alt="BuildCrex" class="h-16 mx-auto rounded-lg">
+            </div>
+            <p class="text-gray-400" data-i18n="footer_copyright">
+                © 2025 BuildCrex. Building Canada's future with compliance and confidence.
+            </p>
+            <p class="text-sm text-gray-500 mt-2" data-i18n="footer_compliance">
+                Compliant with Quebec Safety Code S-2.1, r. 4 for Construction Industry
+            </p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
