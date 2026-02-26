@@ -1,36 +1,5 @@
 // BuildCrex - Main JavaScript File
-// Full-Stack Implementation with Supabase Auth, Localization, Tax Handling, Offline Support, and Admin Features
-
-// ===== SUPABASE AUTHENTICATION =====
-const SUPABASE_URL = 'https://rclvilcwfnwuicmtwmiw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjbHZpbGN3Zm53dWljbXR3bWl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njg5OTgsImV4cCI6MjA4NzM0NDk5OH0.-nUmlb2MHJ7neMD_U1iiClYUoAw4horRkw3mYCUKwtI';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// Current authenticated user
-let currentAuthUser = null;
-
-// Inject spinner styles
-(function injectSpinnerStyles() {
-    const style = document.createElement('style');
-    style.textContent = `
-        .spinner {
-            border: 3px solid rgba(255, 215, 0, 0.3);
-            border-top: 3px solid #FFD700;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    `;
-    document.head.appendChild(style);
-})();
+// Full-Stack Implementation with Localization, Tax Handling, Offline Support, and Admin Features
 
 // ===== BRAND COLORS =====
 const BrandColors = {
@@ -1522,169 +1491,28 @@ document.addEventListener('DOMContentLoaded', function() {
     updatePageLanguage();
     updateLanguageToggle();
     
-    // Check existing session
-    checkAuthSession();
-    
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
     
-    // Login Form Handler - Real Supabase Auth
     if (loginForm) {
-        loginForm.addEventListener('submit', async function(e) {
+        loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            const submitBtn = document.getElementById('loginSubmitBtn');
-            
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner"></span>Logging in...';
-            
-            try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-                
-                if (error) {
-                    // Handle specific error cases
-                    if (error.message.includes('Email not confirmed')) {
-                        alert('Please check your email inbox and confirm your email address before logging in.');
-                    } else if (error.message.includes('Invalid login')) {
-                        alert('Invalid email or password. Please try again.');
-                    } else {
-                        alert('Login failed: ' + error.message);
-                    }
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = t('login_button');
-                    return;
-                }
-                
-                // Login successful
-                currentAuthUser = data.user;
-                showNotification(t('notif_login_success'));
-                closeModal('loginModal');
-                
-                // Reset button
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = t('login_button');
-                
-                // Redirect to dashboard
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-                
-            } catch (err) {
-                console.error('Login error:', err);
-                alert('An unexpected error occurred. Please try again.');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = t('login_button');
-            }
+            showNotification(t('notif_login_success'));
+            closeModal('loginModal');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
         });
     }
     
-    // Signup Form Handler - Real Supabase Auth
     if (signupForm) {
-        signupForm.addEventListener('submit', async function(e) {
+        signupForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            const companyName = document.getElementById('signupCompany').value.trim();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            const role = document.getElementById('signupRole').value;
-            const submitBtn = document.getElementById('signupSubmitBtn');
-            
-            // Validation
-            if (!companyName || !email || !password || !role) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-            
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters long.');
-                return;
-            }
-            
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner"></span>Creating account...';
-            
-            try {
-                const { data, error } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: {
-                        data: {
-                            role: role,
-                            companyName: companyName
-                        }
-                    }
-                });
-                
-                if (error) {
-                    alert('Signup failed: ' + error.message);
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = t('signup_button');
-                    return;
-                }
-                
-                // Signup successful - show email confirmation message
-                alert('Account created! Please check your email inbox to confirm your address and activate your account.');
-                
-                // Reset button and close modal
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = t('signup_button');
-                closeModal('signupModal');
-                signupForm.reset();
-                
-            } catch (err) {
-                console.error('Signup error:', err);
-                alert('An unexpected error occurred. Please try again.');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = t('signup_button');
-            }
+            showNotification(t('notif_signup_success'));
+            closeModal('signupModal');
         });
     }
 });
-
-// Check for existing auth session
-async function checkAuthSession() {
-    try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-            console.error('Session check error:', error);
-            return;
-        }
-        
-        if (session) {
-            currentAuthUser = session.user;
-            console.log('User is authenticated:', currentAuthUser.email);
-        } else {
-            currentAuthUser = null;
-        }
-    } catch (err) {
-        console.error('Session check failed:', err);
-    }
-}
-
-// Get current authenticated user
-function getCurrentAuthUser() {
-    return currentAuthUser;
-}
-
-// Logout function
-async function logoutUser() {
-    try {
-        await supabase.auth.signOut();
-        currentAuthUser = null;
-        window.location.href = 'index.html';
-    } catch (err) {
-        console.error('Logout error:', err);
-        window.location.href = 'index.html';
-    }
-}
 
 // ===== LANDING PAGE FUNCTIONS =====
 function scrollToFeatures() {
@@ -2535,9 +2363,3 @@ window.deleteProduct = deleteProduct;
 window.showAddProductModal = showAddProductModal;
 window.saveTaxSettings = saveTaxSettings;
 window.loadAdminData = loadAdminData;
-
-// Export Supabase auth functions
-window.supabase = supabase;
-window.getCurrentAuthUser = getCurrentAuthUser;
-window.logoutUser = logoutUser;
-window.checkAuthSession = checkAuthSession;

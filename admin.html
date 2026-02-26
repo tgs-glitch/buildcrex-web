@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n-title="admin_title">Admin Control Panel - BuildCrex</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -54,12 +53,6 @@
             background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(255, 215, 0, 0.4);
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
         }
         
         .btn-danger {
@@ -239,391 +232,223 @@
         .tab-content.active {
             display: block;
         }
-
-        /* Admin Login Overlay */
-        .admin-login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-blue) 100%);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .admin-login-overlay.hidden {
-            display: none !important;
-        }
-
-        .admin-login-box {
-            background: linear-gradient(145deg, var(--navy-light) 0%, var(--navy-blue) 100%);
-            border-radius: 24px;
-            padding: 3rem;
-            max-width: 450px;
-            width: 90%;
-            border: 2px solid var(--gold);
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
-        }
-
-        .admin-login-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .admin-login-header img {
-            height: 60px;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-        }
-
-        .admin-login-header h2 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--gold);
-        }
-
-        .admin-login-header p {
-            color: #94a3b8;
-            margin-top: 0.5rem;
-        }
-
-        .otp-inputs {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .otp-input {
-            width: 50px;
-            height: 60px;
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            background: rgba(15, 23, 42, 0.8);
-            border: 2px solid rgba(255, 215, 0, 0.3);
-            border-radius: 10px;
-            color: var(--white);
-        }
-
-        .otp-input:focus {
-            outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.15);
-        }
-
-        /* Loading spinner */
-        .spinner {
-            border: 3px solid rgba(255, 215, 0, 0.3);
-            border-top: 3px solid var(--gold);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 8px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            color: #fca5a5;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .success-message {
-            background: rgba(16, 185, 129, 0.2);
-            border: 1px solid rgba(16, 185, 129, 0.5);
-            color: #6ee7b7;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-        }
     </style>
 </head>
 <body>
-    <!-- Admin Login Overlay - Shown until authenticated -->
-    <div id="adminLoginOverlay" class="admin-login-overlay">
-        <div class="admin-login-box">
-            <div class="admin-login-header">
-                <img src="./resources/buildcrex-logo.jpg" alt="BuildCrex">
-                <h2>Admin Access</h2>
-                <p id="loginSubtitle">Enter your credentials to continue</p>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="p-6">
+            <div class="mb-8">
+                <a href="index.html">
+                    <img src="./resources/buildcrex-logo.jpg" alt="BuildCrex" class="h-14 rounded-lg">
+                </a>
             </div>
-
-            <!-- Message Container -->
-            <div id="loginMessage"></div>
-
-            <!-- Step 1: Credentials Form -->
-            <form id="adminCredentialsForm">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Admin Email</label>
-                    <input type="email" id="adminEmail" class="form-input" placeholder="Enter admin email" required>
-                </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-medium mb-2">Password</label>
-                    <input type="password" id="adminPassword" class="form-input" placeholder="Enter password" required>
-                </div>
-                <button type="submit" id="credentialsSubmitBtn" class="btn-primary w-full py-3 rounded-lg font-semibold">
-                    Continue
-                </button>
-            </form>
-
-            <!-- Step 2: OTP Form (Hidden initially) -->
-            <form id="adminOtpForm" style="display: none;">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2 text-center">Enter 6-digit verification code</label>
-                    <p class="text-sm text-gray-400 text-center mb-4">A code has been sent to techyguysam@gmail.com</p>
-                    <div class="otp-inputs">
-                        <input type="text" class="otp-input" maxlength="1" data-index="0">
-                        <input type="text" class="otp-input" maxlength="1" data-index="1">
-                        <input type="text" class="otp-input" maxlength="1" data-index="2">
-                        <input type="text" class="otp-input" maxlength="1" data-index="3">
-                        <input type="text" class="otp-input" maxlength="1" data-index="4">
-                        <input type="text" class="otp-input" maxlength="1" data-index="5">
+            
+            <!-- Admin Profile -->
+            <div class="card p-4 mb-6">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-shield text-[#1a2744] text-xl"></i>
                     </div>
-                    <input type="hidden" id="otpCode" value="">
+                    <div>
+                        <h3 class="font-semibold">Admin User</h3>
+                        <p class="text-sm text-gray-400">Administrator</p>
+                    </div>
                 </div>
-                <button type="submit" id="otpSubmitBtn" class="btn-primary w-full py-3 rounded-lg font-semibold">
-                    Verify Code
-                </button>
-                <button type="button" id="backToCredentialsBtn" class="btn-secondary w-full py-3 rounded-lg font-semibold mt-3" style="background: transparent; border: 2px solid var(--gold); color: var(--gold);">
-                    Back
-                </button>
-            </form>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="space-y-1">
+                <div class="nav-item active" onclick="showAdminTab('dashboard')">
+                    <i class="fas fa-tachometer-alt mr-3 w-5"></i><span data-i18n="admin_dashboard">Dashboard</span>
+                </div>
+                <div class="nav-item" onclick="showAdminTab('verification')">
+                    <i class="fas fa-user-check mr-3 w-5"></i><span data-i18n="user_verification">User Verification</span>
+                </div>
+                <div class="nav-item" onclick="showAdminTab('inventory')">
+                    <i class="fas fa-boxes mr-3 w-5"></i><span data-i18n="inventory_management">Inventory</span>
+                </div>
+                <div class="nav-item" onclick="showAdminTab('settings')">
+                    <i class="fas fa-cog mr-3 w-5"></i><span data-i18n="system_settings">Settings</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='dashboard.html'">
+                    <i class="fas fa-arrow-left mr-3 w-5"></i><span data-i18n="nav_dashboard">Back to Dashboard</span>
+                </div>
+            </nav>
         </div>
     </div>
 
-    <!-- Main Admin Dashboard (Hidden until authenticated) -->
-    <div id="adminDashboard" style="display: none;">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="p-6">
-                <div class="mb-8">
-                    <a href="index.html">
-                        <img src="./resources/buildcrex-logo.jpg" alt="BuildCrex" class="h-14 rounded-lg">
-                    </a>
-                </div>
-                
-                <!-- Admin Profile -->
-                <div class="card p-4 mb-6">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-full flex items-center justify-center">
-                            <i class="fas fa-user-shield text-[#1a2744] text-xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-semibold">Admin User</h3>
-                            <p class="text-sm text-gray-400">Administrator</p>
-                        </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="bg-[#0f172a] p-6 border-b border-[#FFD700]/20">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold" id="adminPageTitle" data-i18n="admin_dashboard">Admin Dashboard</h2>
+                <div class="flex items-center space-x-4">
+                    <!-- Language Toggle -->
+                    <div class="lang-toggle">
+                        <button id="langToggleEn" class="active" onclick="toggleLanguage()">EN</button>
+                        <button id="langToggleFr" onclick="toggleLanguage()">FR</button>
                     </div>
                 </div>
-                
-                <!-- Navigation -->
-                <nav class="space-y-1">
-                    <div class="nav-item active" onclick="showAdminTab('dashboard')">
-                        <i class="fas fa-tachometer-alt mr-3 w-5"></i><span data-i18n="admin_dashboard">Dashboard</span>
+            </div>
+        </header>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboardTab" class="tab-content active p-6">
+            <!-- Key Metrics -->
+            <div class="grid md:grid-cols-4 gap-6 mb-8">
+                <div class="metric-card text-center">
+                    <i class="fas fa-users text-[#FFD700] text-3xl mb-3"></i>
+                    <p class="text-3xl font-bold" id="adminTotalUsers">0</p>
+                    <p class="text-gray-400" data-i18n="total_users">Total Users</p>
+                </div>
+                <div class="metric-card text-center">
+                    <i class="fas fa-project-diagram text-green-500 text-3xl mb-3"></i>
+                    <p class="text-3xl font-bold" id="adminActiveProjects">0</p>
+                    <p class="text-gray-400" data-i18n="active_projects_admin">Active Projects</p>
+                </div>
+                <div class="metric-card text-center">
+                    <i class="fas fa-dollar-sign text-[#FFD700] text-3xl mb-3"></i>
+                    <p class="text-3xl font-bold" id="adminTotalEscrow">$0</p>
+                    <p class="text-gray-400" data-i18n="total_escrow">Total Escrow Volume</p>
+                </div>
+                <div class="metric-card text-center">
+                    <i class="fas fa-clock text-yellow-500 text-3xl mb-3"></i>
+                    <p class="text-3xl font-bold" id="adminPendingVerifications">0</p>
+                    <p class="text-gray-400" data-i18n="pending_verifications">Pending Verifications</p>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-4 gradient-text">Recent Projects</h3>
+                    <div id="recentProjectsList">
+                        <!-- Populated by JS -->
                     </div>
-                    <div class="nav-item" onclick="showAdminTab('verification')">
-                        <i class="fas fa-user-check mr-3 w-5"></i><span data-i18n="user_verification">User Verification</span>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-4 gradient-text">System Status</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
+                            <span>Database</span>
+                            <span class="text-green-500"><i class="fas fa-check-circle mr-1"></i>Online</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
+                            <span>Payment Gateway</span>
+                            <span class="text-green-500"><i class="fas fa-check-circle mr-1"></i>Online</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
+                            <span>Email Service</span>
+                            <span class="text-green-500"><i class="fas fa-check-circle mr-1"></i>Online</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
+                            <span>CDN</span>
+                            <span class="text-green-500"><i class="fas fa-check-circle mr-1"></i>Online</span>
+                        </div>
                     </div>
-                    <div class="nav-item" onclick="showAdminTab('inventory')">
-                        <i class="fas fa-boxes mr-3 w-5"></i><span data-i18n="inventory_management">Inventory</span>
-                    </div>
-                    <div class="nav-item" onclick="showAdminTab('settings')">
-                        <i class="fas fa-cog mr-3 w-5"></i><span data-i18n="system_settings">Settings</span>
-                    </div>
-                    <div class="nav-item" onclick="logoutAdmin()">
-                        <i class="fas fa-sign-out-alt mr-3 w-5"></i><span>Logout</span>
-                    </div>
-                </nav>
+                </div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Header -->
-            <header class="bg-[#0f172a] p-6 border-b border-[#FFD700]/20">
-                <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold" id="adminPageTitle" data-i18n="admin_dashboard">Admin Dashboard</h2>
-                    <div class="flex items-center space-x-4">
-                        <!-- Language Toggle -->
-                        <div class="lang-toggle">
-                            <button id="langToggleEn" class="active" onclick="toggleLanguage()">EN</button>
-                            <button id="langToggleFr" onclick="toggleLanguage()">FR</button>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Dashboard Tab -->
-            <div id="dashboardTab" class="tab-content active p-6">
-                <!-- Key Metrics -->
-                <div class="grid md:grid-cols-4 gap-6 mb-8">
-                    <div class="metric-card text-center">
-                        <i class="fas fa-users text-[#FFD700] text-3xl mb-3"></i>
-                        <p class="text-3xl font-bold" id="adminTotalUsers">0</p>
-                        <p class="text-gray-400" data-i18n="total_users">Total Users</p>
-                    </div>
-                    <div class="metric-card text-center">
-                        <i class="fas fa-project-diagram text-green-500 text-3xl mb-3"></i>
-                        <p class="text-3xl font-bold" id="adminActiveProjects">0</p>
-                        <p class="text-gray-400" data-i18n="active_projects_admin">Active Projects</p>
-                    </div>
-                    <div class="metric-card text-center">
-                        <i class="fas fa-dollar-sign text-[#FFD700] text-3xl mb-3"></i>
-                        <p class="text-3xl font-bold" id="adminTotalEscrow">$0</p>
-                        <p class="text-gray-400" data-i18n="total_escrow">Total Escrow Volume</p>
-                    </div>
-                    <div class="metric-card text-center">
-                        <i class="fas fa-clock text-yellow-500 text-3xl mb-3"></i>
-                        <p class="text-3xl font-bold" id="adminPendingVerifications">0</p>
-                        <p class="text-gray-400" data-i18n="pending_verifications">Pending Verifications</p>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="card p-6">
-                        <h3 class="text-xl font-bold mb-4 gradient-text">Recent Projects</h3>
-                        <div id="recentProjectsList">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
-                    <div class="card p-6">
-                        <h3 class="text-xl font-bold mb-4 gradient-text">System Status</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
-                                <span>Database</span>
-                                <span class="text-green-500"><i class="fas fa-check-circle mr-1"></i>Online</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
-                                <span>Payment Gateway</span>
-                                <span class="text-green-500"><i class="fas fa-check-circle mr-1"></i>Online</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
-                                <span>Email Service</span>
-                                <span class="text-green-500"><i class="fas fa-check-circle mr-1"></i>Online</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
-                                <span>CDN</span>
-                                <span class="text-green-500"><i class="fas fa-check-circle mr-1"></i>Online</span>
-                            </div>
-                        </div>
-                    </div>
+        <!-- User Verification Tab -->
+        <div id="verificationTab" class="tab-content p-6 hidden">
+            <div class="card p-6">
+                <h3 class="text-xl font-bold mb-6 gradient-text" data-i18n="user_verification">User Verification</h3>
+                <div id="pendingVerificationsList">
+                    <!-- Pending verifications populated by JS -->
                 </div>
             </div>
+        </div>
 
-            <!-- User Verification Tab -->
-            <div id="verificationTab" class="tab-content p-6 hidden">
-                <div class="card p-6">
-                    <h3 class="text-xl font-bold mb-6 gradient-text" data-i18n="user_verification">User Verification</h3>
-                    <div id="pendingVerificationsList">
-                        <!-- Pending verifications populated by JS -->
-                    </div>
+        <!-- Inventory Management Tab -->
+        <div id="inventoryTab" class="tab-content p-6 hidden">
+            <div class="card p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold gradient-text" data-i18n="inventory_management">Inventory Management</h3>
+                    <button onclick="openModal('addProductModal')" class="btn-primary px-4 py-2 rounded-lg">
+                        <i class="fas fa-plus mr-2"></i><span data-i18n="add_product">Add Product</span>
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="product_name">Product Name</th>
+                                <th data-i18n="category">Category</th>
+                                <th data-i18n="price">Price</th>
+                                <th data-i18n="stock_level">Stock Level</th>
+                                <th data-i18n="eco_eligible_admin">Eco-Eligible</th>
+                                <th data-i18n="actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventoryList">
+                            <!-- Inventory populated by JS -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
 
-            <!-- Inventory Management Tab -->
-            <div id="inventoryTab" class="tab-content p-6 hidden">
-                <div class="card p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold gradient-text" data-i18n="inventory_management">Inventory Management</h3>
-                        <button onclick="openModal('addProductModal')" class="btn-primary px-4 py-2 rounded-lg">
-                            <i class="fas fa-plus mr-2"></i><span data-i18n="add_product">Add Product</span>
-                        </button>
+        <!-- System Settings Tab -->
+        <div id="settingsTab" class="tab-content p-6 hidden">
+            <div class="max-w-2xl">
+                <div class="card p-6 mb-6">
+                    <h3 class="text-xl font-bold mb-6 gradient-text" data-i18n="tax_rates">Tax Rates</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2" data-i18n="gst_rate">GST Rate (%)</label>
+                            <input type="number" class="form-input" id="gstRate" value="5.00" step="0.01" min="0" max="100">
+                            <p class="text-xs text-gray-400 mt-1">Goods and Services Tax (Federal)</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2" data-i18n="qst_rate">QST Rate (%)</label>
+                            <input type="number" class="form-input" id="qstRate" value="9.975" step="0.001" min="0" max="100">
+                            <p class="text-xs text-gray-400 mt-1">Quebec Sales Tax (Provincial)</p>
+                        </div>
                     </div>
                     
-                    <div class="overflow-x-auto">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th data-i18n="product_name">Product Name</th>
-                                    <th data-i18n="category">Category</th>
-                                    <th data-i18n="price">Price</th>
-                                    <th data-i18n="stock_level">Stock Level</th>
-                                    <th data-i18n="eco_eligible_admin">Eco-Eligible</th>
-                                    <th data-i18n="actions">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inventoryList">
-                                <!-- Inventory populated by JS -->
-                            </tbody>
-                        </table>
-                    </div>
+                    <button onclick="saveTaxSettings()" class="btn-primary w-full py-3 rounded-lg font-semibold mt-6" data-i18n="save_settings">
+                        Save Settings
+                    </button>
                 </div>
-            </div>
-
-            <!-- System Settings Tab -->
-            <div id="settingsTab" class="tab-content p-6 hidden">
-                <div class="max-w-2xl">
-                    <div class="card p-6 mb-6">
-                        <h3 class="text-xl font-bold mb-6 gradient-text" data-i18n="tax_rates">Tax Rates</h3>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium mb-2" data-i18n="gst_rate">GST Rate (%)</label>
-                                <input type="number" class="form-input" id="gstRate" value="5.00" step="0.01" min="0" max="100">
-                                <p class="text-xs text-gray-400 mt-1">Goods and Services Tax (Federal)</p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium mb-2" data-i18n="qst_rate">QST Rate (%)</label>
-                                <input type="number" class="form-input" id="qstRate" value="9.975" step="0.001" min="0" max="100">
-                                <p class="text-xs text-gray-400 mt-1">Quebec Sales Tax (Provincial)</p>
-                            </div>
-                        </div>
-                        
-                        <button onclick="saveTaxSettings()" class="btn-primary w-full py-3 rounded-lg font-semibold mt-6" data-i18n="save_settings">
-                            Save Settings
-                        </button>
-                    </div>
+                
+                <div class="card p-6">
+                    <h3 class="text-xl font-bold mb-6 gradient-text">Platform Settings</h3>
                     
-                    <div class="card p-6">
-                        <h3 class="text-xl font-bold mb-6 gradient-text">Platform Settings</h3>
-                        
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
-                                <div>
-                                    <p class="font-semibold">Maintenance Mode</p>
-                                    <p class="text-sm text-gray-400">Temporarily disable the platform</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FFD700]"></div>
-                                </label>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
+                            <div>
+                                <p class="font-semibold">Maintenance Mode</p>
+                                <p class="text-sm text-gray-400">Temporarily disable the platform</p>
                             </div>
-                            <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
-                                <div>
-                                    <p class="font-semibold">New User Registration</p>
-                                    <p class="text-sm text-gray-400">Allow new users to sign up</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" checked>
-                                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FFD700]"></div>
-                                </label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FFD700]"></div>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
+                            <div>
+                                <p class="font-semibold">New User Registration</p>
+                                <p class="text-sm text-gray-400">Allow new users to sign up</p>
                             </div>
-                            <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
-                                <div>
-                                    <p class="font-semibold">Email Notifications</p>
-                                    <p class="text-sm text-gray-400">Send email alerts to users</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer" checked>
-                                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FFD700]"></div>
-                                </label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FFD700]"></div>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-[#0f172a]/50 rounded-lg">
+                            <div>
+                                <p class="font-semibold">Email Notifications</p>
+                                <p class="text-sm text-gray-400">Send email alerts to users</p>
                             </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FFD700]"></div>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -685,257 +510,10 @@
 
     <script src="main.js"></script>
     <script>
-        // ===== SUPABASE ADMIN AUTHENTICATION =====
-        const SUPABASE_URL = 'https://rclvilcwfnwuicmtwmiw.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjbHZpbGN3Zm53dWljbXR3bWl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njg5OTgsImV4cCI6MjA4NzM0NDk5OH0.-nUmlb2MHJ7neMD_U1iiClYUoAw4horRkw3mYCUKwtI';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // Admin credentials (hardcoded as per requirements)
-        const ADMIN_EMAIL = 'techyguysam@gmail.com';
-        const ADMIN_PASSWORD = 'SamKayBx007$';
-
-        // DOM Elements
-        const loginOverlay = document.getElementById('adminLoginOverlay');
-        const adminDashboard = document.getElementById('adminDashboard');
-        const credentialsForm = document.getElementById('adminCredentialsForm');
-        const otpForm = document.getElementById('adminOtpForm');
-        const loginMessage = document.getElementById('loginMessage');
-        const loginSubtitle = document.getElementById('loginSubtitle');
-
-        // Check if user is already authenticated on page load
-        document.addEventListener('DOMContentLoaded', async function() {
-            await checkAdminSession();
-        });
-
-        // Check admin session
-        async function checkAdminSession() {
-            try {
-                const { data: { session }, error } = await supabase.auth.getSession();
-                
-                if (error) {
-                    console.error('Session check error:', error);
-                    showLoginOverlay();
-                    return;
-                }
-
-                if (session && session.user && session.user.email === ADMIN_EMAIL) {
-                    // User is authenticated as admin
-                    showAdminDashboard();
-                } else {
-                    // No valid session, show login
-                    showLoginOverlay();
-                }
-            } catch (err) {
-                console.error('Session check failed:', err);
-                showLoginOverlay();
-            }
-        }
-
-        // Show login overlay
-        function showLoginOverlay() {
-            loginOverlay.classList.remove('hidden');
-            adminDashboard.style.display = 'none';
-        }
-
-        // Show admin dashboard
-        function showAdminDashboard() {
-            loginOverlay.classList.add('hidden');
-            adminDashboard.style.display = 'block';
-            loadAdminData();
-        }
-
-        // Show message in login box
-        function showLoginMessage(message, type = 'error') {
-            loginMessage.innerHTML = `<div class="${type === 'error' ? 'error-message' : 'success-message'}">${message}</div>`;
-        }
-
-        // Clear login message
-        function clearLoginMessage() {
-            loginMessage.innerHTML = '';
-        }
-
-        // Step 1: Handle credentials form submission
-        credentialsForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            clearLoginMessage();
-
-            const email = document.getElementById('adminEmail').value.trim();
-            const password = document.getElementById('adminPassword').value;
-            const submitBtn = document.getElementById('credentialsSubmitBtn');
-
-            // Hardcoded credential check
-            if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
-                showLoginMessage('Invalid admin credentials. Access denied.');
-                return;
-            }
-
-            // Disable button and show loading
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner"></span>Sending code...';
-
-            try {
-                // Send OTP via Supabase
-                const { data, error } = await supabase.auth.signInWithOtp({
-                    email: ADMIN_EMAIL
-                });
-
-                if (error) {
-                    showLoginMessage('Failed to send verification code. Please try again.');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Continue';
-                    return;
-                }
-
-                // Show OTP form
-                credentialsForm.style.display = 'none';
-                otpForm.style.display = 'block';
-                loginSubtitle.textContent = 'Enter the 6-digit code sent to your email';
-                
-                // Focus first OTP input
-                setTimeout(() => {
-                    document.querySelector('.otp-input[data-index="0"]').focus();
-                }, 100);
-
-            } catch (err) {
-                console.error('OTP send error:', err);
-                showLoginMessage('An error occurred. Please try again.');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Continue';
-            }
-        });
-
-        // Handle OTP input fields
-        const otpInputs = document.querySelectorAll('.otp-input');
-        otpInputs.forEach((input, index) => {
-            input.addEventListener('input', function(e) {
-                // Only allow numbers
-                this.value = this.value.replace(/[^0-9]/g, '');
-                
-                if (this.value.length === 1) {
-                    // Move to next input
-                    if (index < otpInputs.length - 1) {
-                        otpInputs[index + 1].focus();
-                    }
-                }
-                
-                // Update hidden input with full code
-                updateOtpCode();
-            });
-
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Backspace' && this.value === '' && index > 0) {
-                    // Move to previous input on backspace
-                    otpInputs[index - 1].focus();
-                }
-            });
-
-            // Handle paste
-            input.addEventListener('paste', function(e) {
-                e.preventDefault();
-                const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
-                
-                pastedData.split('').forEach((digit, i) => {
-                    if (otpInputs[i]) {
-                        otpInputs[i].value = digit;
-                    }
-                });
-                
-                updateOtpCode();
-                
-                // Focus last filled input or submit button
-                const lastFilledIndex = Math.min(pastedData.length, 5);
-                if (lastFilledIndex < 6) {
-                    otpInputs[lastFilledIndex].focus();
-                }
-            });
-        });
-
-        // Update hidden OTP code field
-        function updateOtpCode() {
-            let code = '';
-            otpInputs.forEach(input => {
-                code += input.value;
-            });
-            document.getElementById('otpCode').value = code;
-        }
-
-        // Step 3: Handle OTP verification
-        otpForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            clearLoginMessage();
-
-            const code = document.getElementById('otpCode').value;
-            const submitBtn = document.getElementById('otpSubmitBtn');
-
-            if (code.length !== 6) {
-                showLoginMessage('Please enter all 6 digits of the verification code.');
-                return;
-            }
-
-            // Disable button and show loading
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner"></span>Verifying...';
-
-            try {
-                // Verify OTP with Supabase
-                const { data, error } = await supabase.auth.verifyOtp({
-                    email: ADMIN_EMAIL,
-                    token: code,
-                    type: 'email'
-                });
-
-                if (error) {
-                    showLoginMessage('Invalid verification code. Please try again.');
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Verify Code';
-                    return;
-                }
-
-                // Success! Show admin dashboard
-                showAdminDashboard();
-
-            } catch (err) {
-                console.error('OTP verification error:', err);
-                showLoginMessage('Verification failed. Please try again.');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Verify Code';
-            }
-        });
-
-        // Back button handler
-        document.getElementById('backToCredentialsBtn').addEventListener('click', function() {
-            otpForm.style.display = 'none';
-            credentialsForm.style.display = 'block';
-            loginSubtitle.textContent = 'Enter your credentials to continue';
-            clearLoginMessage();
-            
-            // Reset OTP inputs
-            otpInputs.forEach(input => input.value = '');
-            document.getElementById('otpCode').value = '';
-            
-            // Reset button state
-            const submitBtn = document.getElementById('otpSubmitBtn');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Verify Code';
-        });
-
-        // Logout function
-        async function logoutAdmin() {
-            try {
-                await supabase.auth.signOut();
-                window.location.href = 'index.html';
-            } catch (err) {
-                console.error('Logout error:', err);
-                window.location.href = 'index.html';
-            }
-        }
-
-        // Expose logout function globally
-        window.logoutAdmin = logoutAdmin;
-    </script>
-    <script>
         // Admin-specific functions
         document.addEventListener('DOMContentLoaded', function() {
+            loadAdminData();
+            
             // Add product form handler
             const addProductForm = document.getElementById('addProductForm');
             if (addProductForm) {
