@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n-title="safety_page_title">Safety Analysis - BuildCrex</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -606,7 +605,7 @@
             <div class="flex justify-between items-center h-20">
                 <div class="flex items-center">
                     <a href="index.html">
-                        <img src="./resources/buildcrex-logo.jpg" alt="BuildCrex" class="h-12 rounded-lg">
+                        <img src="./resources/buildcrex-logo-transparent.png" alt="BuildCrex" class="h-12 bg-transparent">
                     </a>
                 </div>
                 <div class="hidden md:flex space-x-8">
@@ -640,6 +639,76 @@
                 Generate comprehensive safety directives based on Quebec Safety Code S-2.1, r. 4 
                 for Construction Industry. Ensure compliance before work begins.
             </p>
+        </div>
+
+        <!-- FEATURE 1: Live Risk Dashboard -->
+        <div class="card p-6 mb-8 border-2 border-red-500/50" id="liveRiskDashboard">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold flex items-center">
+                    <i class="fas fa-heartbeat text-red-500 mr-3 animate-pulse"></i>
+                    <span data-i18n="live_risk_dashboard">Live Risk Dashboard</span>
+                    <span class="ml-3 px-3 py-1 bg-red-500/20 text-red-400 text-xs rounded-full border border-red-500/50" data-i18n="ai_predictive">AI PREDICTIVE</span>
+                </h3>
+                <span class="text-sm text-gray-400" id="lastUpdated">Updated: Just now</span>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6 mb-6">
+                <!-- Weather Status -->
+                <div class="bg-[#0f172a]/50 rounded-xl p-4 border border-[#FFD700]/20">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-temperature-high text-orange-500 text-xl mr-3"></i>
+                        <span class="text-sm text-gray-400" data-i18n="live_weather">Live Weather</span>
+                    </div>
+                    <p class="text-2xl font-bold text-orange-400">33°C <span data-i18n="severe_heat">Severe Heat</span></p>
+                    <p class="text-xs text-gray-500 mt-1" data-i18n="heat_warning">Heat stress risk elevated</p>
+                </div>
+                
+                <!-- Crew Fatigue -->
+                <div class="bg-[#0f172a]/50 rounded-xl p-4 border border-[#FFD700]/20">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-user-clock text-yellow-500 text-xl mr-3"></i>
+                        <span class="text-sm text-gray-400" data-i18n="crew_fatigue">Crew Fatigue</span>
+                    </div>
+                    <p class="text-lg font-bold text-yellow-400">Worker A - 52 <span data-i18n="hours">Hours</span></p>
+                    <p class="text-xs text-gray-500 mt-1" data-i18n="fatigue_alert">Weekly limit exceeded</p>
+                </div>
+                
+                <!-- Incident Probability -->
+                <div class="bg-red-500/10 rounded-xl p-4 border-2 border-red-500/50">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-xl mr-3 animate-pulse"></i>
+                        <span class="text-sm text-red-300" data-i18n="incident_probability">Incident Probability</span>
+                    </div>
+                    <p class="text-3xl font-bold text-red-500">84%</p>
+                    <p class="text-xs text-red-300 mt-1 font-bold" data-i18n="probability_detected">Incident Probability Detected</p>
+                </div>
+            </div>
+            
+            <!-- AI Intervention Box -->
+            <div class="bg-gradient-to-r from-[#FFD700]/20 to-[#FFD700]/5 rounded-xl p-5 border-2 border-[#FFD700]">
+                <div class="flex items-start">
+                    <div class="w-12 h-12 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                        <i class="fas fa-robot text-[#1a2744] text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-[#FFD700] mb-2 flex items-center">
+                            <span data-i18n="ai_intervention">AI Intervention</span>
+                            <span class="ml-2 px-2 py-0.5 bg-[#FFD700] text-[#1a2744] text-xs rounded font-bold" data-i18n="auto_enforced">AUTO-ENFORCED</span>
+                        </h4>
+                        <p class="text-gray-300" data-i18n="ai_intervention_text">
+                            Mandatory 15-minute hydration rotations enforced. Worker A reassigned to ground-level tasks.
+                        </p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-[#FFD700]/20 text-[#FFD700] text-sm rounded-full border border-[#FFD700]/50">
+                                <i class="fas fa-tint mr-1"></i><span data-i18n="hydration_protocol">Hydration Protocol Active</span>
+                            </span>
+                            <span class="px-3 py-1 bg-[#FFD700]/20 text-[#FFD700] text-sm rounded-full border border-[#FFD700]/50">
+                                <i class="fas fa-exchange-alt mr-1"></i><span data-i18n="reassignment_active">Reassignment Active</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Progress Steps -->
@@ -940,7 +1009,7 @@
     <footer class="bg-[#0f172a] py-12 px-4 border-t border-[#FFD700]/20">
         <div class="max-w-6xl mx-auto text-center">
             <div class="mb-8">
-                <img src="./resources/buildcrex-logo.jpg" alt="BuildCrex" class="h-16 mx-auto rounded-lg">
+                <img src="./resources/buildcrex-logo-transparent.png" alt="BuildCrex" class="h-16 mx-auto bg-transparent">
             </div>
             <p class="text-gray-400" data-i18n="footer_copyright">
                 © 2025 BuildCrex. Building Canada's future with compliance and confidence.

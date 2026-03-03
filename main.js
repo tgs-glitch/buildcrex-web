@@ -1,5 +1,36 @@
 // BuildCrex - Main JavaScript File
-// Full-Stack Implementation with Localization, Tax Handling, Offline Support, and Admin Features
+// Full-Stack Implementation with Supabase Auth, Localization, Tax Handling, Offline Support, and Admin Features
+
+// ===== SUPABASE AUTHENTICATION =====
+const SUPABASE_URL = 'https://rclvilcwfnwuicmtwmiw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjbHZpbGN3Zm53dWljbXR3bWl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njg5OTgsImV4cCI6MjA4NzM0NDk5OH0.-nUmlb2MHJ7neMD_U1iiClYUoAw4horRkw3mYCUKwtI';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Current authenticated user
+let currentAuthUser = null;
+
+// Inject spinner styles
+(function injectSpinnerStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .spinner {
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-top: 3px solid #FFD700;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+})();
 
 // ===== BRAND COLORS =====
 const BrandColors = {
@@ -307,6 +338,64 @@ const Translations = {
         error_file_size: 'File size must be less than 5MB.',
         error_cart_empty: 'Your cart is empty!',
         error_offline: 'You are offline. Changes will be saved locally.',
+        
+        // FEATURE 1: Pre-Cog Risk Architecture
+        live_risk_dashboard: 'Live Risk Dashboard',
+        ai_predictive: 'AI PREDICTIVE',
+        live_weather: 'Live Weather',
+        severe_heat: 'Severe Heat',
+        heat_warning: 'Heat stress risk elevated',
+        crew_fatigue: 'Crew Fatigue',
+        hours: 'Hours',
+        fatigue_alert: 'Weekly limit exceeded',
+        incident_probability: 'Incident Probability',
+        probability_detected: 'Incident Probability Detected',
+        ai_intervention: 'AI Intervention',
+        auto_enforced: 'AUTO-ENFORCED',
+        ai_intervention_text: 'Mandatory 15-minute hydration rotations enforced. Worker A reassigned to ground-level tasks.',
+        hydration_protocol: 'Hydration Protocol Active',
+        reassignment_active: 'Reassignment Active',
+        
+        // FEATURE 2: TradeBrain AI
+        tradebrain_title: 'TradeBrain AI',
+        institutional_memory: 'INSTITUTIONAL MEMORY',
+        voice_to_knowledge: 'Voice-to-Knowledge Capture',
+        listening: 'Listening...',
+        tradebrain_welcome: 'TradeBrain is listening. Describe any site anomalies or observations, and I\'ll search our institutional knowledge base.',
+        tradebrain_user_message: 'We hit a structural anomaly on the heritage wall on St-Catherine, joists don\'t match 1980 blueprints.',
+        tradebrain_ai_response: 'Analyzing historical data for H3B... Anomaly identified. Master logs from 2015 indicate unrecorded reinforcing beams added in 1992. Load-bearing calculation adjusted.',
+        
+        // FEATURE 3: Reality-to-Ledger Escrow
+        initiate_lidar_scan: 'Initiate LiDAR Scan',
+        lidar_scan_title: 'LiDAR Reality Scan',
+        lidar_scan_subtitle: 'Verifying physical completion against smart contract terms',
+        scanning_in_progress: 'Scanning in progress...',
+        analyzing_structure: 'Analyzing structural integrity...',
+        nbc_compliant: 'NBC Code Compliant',
+        smart_contract_unlocked: 'Smart Contract Unlocked. Funds Disbursed.',
+        milestone: 'Milestone',
+        foundation_complete: 'Foundation Complete',
+        amount_released: 'Amount Released',
+        transaction_hash: 'Transaction Hash',
+        close: 'Close',
+        
+        // FEATURE 4: Circular Eco-Loop
+        eco_loop_matches: 'Eco-Loop Matches',
+        algorithmic_routing: 'ALGORITHMIC ROUTING',
+        eco_loop_subtitle: 'AI-powered waste material redistribution network',
+        demolition_laval: 'Demolition in Laval',
+        your_foundation_brossard: 'Your Foundation project in Brossard',
+        crushed_concrete_available: '4 tons of crushed concrete available',
+        route_to_your_project: 'Route to your foundation project?',
+        material_cost: 'Material Cost',
+        transport: 'Transport',
+        carbon_saved: 'Carbon Saved',
+        eco_eligible_rebate: 'Eco-eligible for government rebate',
+        accept_route: 'Accept Route',
+        renovation_downtown: 'Renovation in Downtown',
+        your_parking_project: 'Your Parking Lot project',
+        asphalt_shingles_available: '2.5 tons of asphalt shingles available',
+        suitable_for_paving: 'Suitable for paving base layer?',
     },
     
     fr: {
@@ -603,6 +692,64 @@ const Translations = {
         error_file_size: 'La taille du fichier doit être inférieure à 5Mo.',
         error_cart_empty: 'Votre panier est vide!',
         error_offline: 'Vous êtes hors ligne. Les modifications seront enregistrées localement.',
+        
+        // FEATURE 1: Pre-Cog Risk Architecture
+        live_risk_dashboard: 'Tableau de Bord des Risques en Direct',
+        ai_predictive: 'IA PRÉDICTIVE',
+        live_weather: 'Météo en Direct',
+        severe_heat: 'Chaleur Extrême',
+        heat_warning: 'Risque de stress thermique élevé',
+        crew_fatigue: 'Fatigue de l\'Équipe',
+        hours: 'Heures',
+        fatigue_alert: 'Limite hebdomadaire dépassée',
+        incident_probability: 'Probabilité d\'Incident',
+        probability_detected: 'Probabilité d\'Incident Détectée',
+        ai_intervention: 'Intervention IA',
+        auto_enforced: 'AUTO-ENFORCÉE',
+        ai_intervention_text: 'Rotations d\'hydratation obligatoires de 15 minutes appliquées. L\'ouvrier A réaffecté aux tâches au niveau du sol.',
+        hydration_protocol: 'Protocole d\'Hydratation Actif',
+        reassignment_active: 'Réaffectation Active',
+        
+        // FEATURE 2: TradeBrain AI
+        tradebrain_title: 'TradeBrain IA',
+        institutional_memory: 'MÉMOIRE INSTITUTIONNELLE',
+        voice_to_knowledge: 'Capture Vocale vers Connaissance',
+        listening: 'Écoute en cours...',
+        tradebrain_welcome: 'TradeBrain écoute. Décrivez toute anomalie ou observation sur le chantier, et je rechercherai dans notre base de connaissances institutionnelle.',
+        tradebrain_user_message: 'Nous avons rencontré une anomalie structurelle sur le mur patrimonial de la rue Sainte-Catherine, les solives ne correspondent pas aux plans de 1980.',
+        tradebrain_ai_response: 'Analyse des données historiques pour H3B... Anomalie identifiée. Les registres maîtres de 2015 indiquent des poutres de renforcement ajoutées en 1992 non enregistrées. Calcul de charge portante ajusté.',
+        
+        // FEATURE 3: Reality-to-Ledger Escrow
+        initiate_lidar_scan: 'Lancer le Scan LiDAR',
+        lidar_scan_title: 'Scan Réalité LiDAR',
+        lidar_scan_subtitle: 'Vérification de l\'achèvement physique selon les termes du contrat intelligent',
+        scanning_in_progress: 'Scan en cours...',
+        analyzing_structure: 'Analyse de l\'intégrité structurelle...',
+        nbc_compliant: 'Conforme au Code CNB',
+        smart_contract_unlocked: 'Contrat Intelligent Déverrouillé. Fonds Libérés.',
+        milestone: 'Jalon',
+        foundation_complete: 'Fondation Terminée',
+        amount_released: 'Montant Libéré',
+        transaction_hash: 'Hash de Transaction',
+        close: 'Fermer',
+        
+        // FEATURE 4: Circular Eco-Loop
+        eco_loop_matches: 'Correspondances Éco-Boucle',
+        algorithmic_routing: 'ROUTAGE ALGORITHMIQUE',
+        eco_loop_subtitle: 'Réseau de redistribution de matériaux de déchets alimenté par IA',
+        demolition_laval: 'Démolition à Laval',
+        your_foundation_brossard: 'Votre projet de Fondation à Brossard',
+        crushed_concrete_available: '4 tonnes de béton concassé disponibles',
+        route_to_your_project: 'Router vers votre projet de fondation?',
+        material_cost: 'Coût Matériel',
+        transport: 'Transport',
+        carbon_saved: 'Carbone Économisé',
+        eco_eligible_rebate: 'Éco-éligible pour remise gouvernementale',
+        accept_route: 'Accepter l\'Itinéraire',
+        renovation_downtown: 'Rénovation au Centre-Ville',
+        your_parking_project: 'Votre projet de Stationnement',
+        asphalt_shingles_available: '2,5 tonnes de bardeaux d\'asphalte disponibles',
+        suitable_for_paving: 'Adapté pour couche de base de pavage?',
     }
 };
 
@@ -1491,28 +1638,169 @@ document.addEventListener('DOMContentLoaded', function() {
     updatePageLanguage();
     updateLanguageToggle();
     
+    // Check existing session
+    checkAuthSession();
+    
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
     
+    // Login Form Handler - Real Supabase Auth
     if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
+        loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            showNotification(t('notif_login_success'));
-            closeModal('loginModal');
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1000);
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span>Logging in...';
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) {
+                    // Handle specific error cases
+                    if (error.message.includes('Email not confirmed')) {
+                        alert('Please check your email inbox and confirm your email address before logging in.');
+                    } else if (error.message.includes('Invalid login')) {
+                        alert('Invalid email or password. Please try again.');
+                    } else {
+                        alert('Login failed: ' + error.message);
+                    }
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = t('login_button');
+                    return;
+                }
+                
+                // Login successful
+                currentAuthUser = data.user;
+                showNotification(t('notif_login_success'));
+                closeModal('loginModal');
+                
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = t('login_button');
+                
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+                
+            } catch (err) {
+                console.error('Login error:', err);
+                alert('An unexpected error occurred. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = t('login_button');
+            }
         });
     }
     
+    // Signup Form Handler - Real Supabase Auth
     if (signupForm) {
-        signupForm.addEventListener('submit', function(e) {
+        signupForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            showNotification(t('notif_signup_success'));
-            closeModal('signupModal');
+            
+            const companyName = document.getElementById('signupCompany').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const role = document.getElementById('signupRole').value;
+            const submitBtn = document.getElementById('signupSubmitBtn');
+            
+            // Validation
+            if (!companyName || !email || !password || !role) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                return;
+            }
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span>Creating account...';
+            
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            role: role,
+                            companyName: companyName
+                        }
+                    }
+                });
+                
+                if (error) {
+                    alert('Signup failed: ' + error.message);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = t('signup_button');
+                    return;
+                }
+                
+                // Signup successful - show email confirmation message
+                alert('Account created! Please check your email inbox to confirm your address and activate your account.');
+                
+                // Reset button and close modal
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = t('signup_button');
+                closeModal('signupModal');
+                signupForm.reset();
+                
+            } catch (err) {
+                console.error('Signup error:', err);
+                alert('An unexpected error occurred. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = t('signup_button');
+            }
         });
     }
 });
+
+// Check for existing auth session
+async function checkAuthSession() {
+    try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+            console.error('Session check error:', error);
+            return;
+        }
+        
+        if (session) {
+            currentAuthUser = session.user;
+            console.log('User is authenticated:', currentAuthUser.email);
+        } else {
+            currentAuthUser = null;
+        }
+    } catch (err) {
+        console.error('Session check failed:', err);
+    }
+}
+
+// Get current authenticated user
+function getCurrentAuthUser() {
+    return currentAuthUser;
+}
+
+// Logout function
+async function logoutUser() {
+    try {
+        await supabase.auth.signOut();
+        currentAuthUser = null;
+        window.location.href = 'index.html';
+    } catch (err) {
+        console.error('Logout error:', err);
+        window.location.href = 'index.html';
+    }
+}
 
 // ===== LANDING PAGE FUNCTIONS =====
 function scrollToFeatures() {
@@ -2364,137 +2652,195 @@ window.showAddProductModal = showAddProductModal;
 window.saveTaxSettings = saveTaxSettings;
 window.loadAdminData = loadAdminData;
 
-// ==========================================
-// REAL SUPABASE AUTHENTICATION & ADMIN SECRETS
-// ==========================================
-const SUPABASE_URL = 'https://rclvilcwfnwuicmtwmiw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjbHZpbGN3Zm53dWljbXR3bWl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njg5OTgsImV4cCI6MjA4NzM0NDk5OH0.-nUmlb2MHJ7neMD_U1iiClYUoAw4horRkw3mYCUKwtI';
+// Export Supabase auth functions
+window.supabase = supabase;
+window.getCurrentAuthUser = getCurrentAuthUser;
+window.logoutUser = logoutUser;
+window.checkAuthSession = checkAuthSession;
 
-// Safe initialization (only runs if the CDN script is present)
-let supabase;
-if (window.supabase) {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-} else {
-    console.error("Supabase script missing from HTML head!");
+// ===== FEATURE 2: TradeBrain AI Voice-to-Knowledge Capture =====
+function activateTradeBrainVoice() {
+    const voiceBtn = document.getElementById('tradebrainVoiceBtn');
+    const voiceStatus = document.getElementById('voiceStatus');
+    const messagesContainer = document.getElementById('tradebrainMessages');
+    
+    // Show listening state
+    voiceBtn.disabled = true;
+    voiceBtn.innerHTML = '<span class="spinner"></span>' + t('listening');
+    voiceStatus.classList.remove('hidden');
+    
+    // Simulate voice capture delay
+    setTimeout(() => {
+        // Add user message
+        const userMessageHTML = `
+            <div class="flex items-start justify-end">
+                <div class="bg-[#FFD700] text-[#1a2744] rounded-xl rounded-tr-none p-3 max-w-[80%]">
+                    <p class="text-sm">${t('tradebrain_user_message')}</p>
+                </div>
+                <div class="w-10 h-10 bg-[#243656] rounded-full flex items-center justify-center ml-3 flex-shrink-0">
+                    <i class="fas fa-user text-gray-400"></i>
+                </div>
+            </div>
+        `;
+        messagesContainer.insertAdjacentHTML('beforeend', userMessageHTML);
+        
+        // Show AI thinking
+        setTimeout(() => {
+            const thinkingHTML = `
+                <div class="flex items-start" id="tradebrainThinking">
+                    <div class="w-10 h-10 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                        <i class="fas fa-robot text-[#1a2744]"></i>
+                    </div>
+                    <div class="bg-[#243656] rounded-xl rounded-tl-none p-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce"></span>
+                            <span class="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+                            <span class="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            messagesContainer.insertAdjacentHTML('beforeend', thinkingHTML);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Show AI response
+            setTimeout(() => {
+                document.getElementById('tradebrainThinking').remove();
+                const aiResponseHTML = `
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 bg-gradient-to-br from-[#FFD700] to-[#E6C200] rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                            <i class="fas fa-robot text-[#1a2744]"></i>
+                        </div>
+                        <div class="bg-[#243656] rounded-xl rounded-tl-none p-3 max-w-[80%]">
+                            <p class="text-gray-300 text-sm">${t('tradebrain_ai_response')}</p>
+                        </div>
+                    </div>
+                `;
+                messagesContainer.insertAdjacentHTML('beforeend', aiResponseHTML);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Reset button
+                voiceBtn.disabled = false;
+                voiceBtn.innerHTML = '<i class="fas fa-microphone text-2xl mr-3"></i><span data-i18n="voice_to_knowledge">' + t('voice_to_knowledge') + '</span>';
+                voiceStatus.classList.add('hidden');
+            }, 2000);
+        }, 500);
+    }, 2000);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+// ===== FEATURE 3: Reality-to-Ledger Escrow - LiDAR Scan =====
+function initiateLiDARScan(projectId) {
+    openModal('lidarScanModal');
     
-    // 1. STANDARD USER LOGIN
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm && supabase) {
-        loginForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
-            const btn = document.getElementById('loginSubmitBtn');
-            
-            btn.innerHTML = 'Logging in...';
-            
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            
-            if (error) {
-                if (error.message.includes('Email not confirmed')) {
-                    alert('Please check your email and verify your account first.');
-                } else {
-                    alert('Login Failed: ' + error.message);
-                }
-                btn.innerHTML = 'Login';
-                return;
-            }
-            
-            window.location.href = 'dashboard.html';
-        });
-    }
+    // Reset modal state
+    document.getElementById('scanningAnimation').classList.remove('hidden');
+    document.getElementById('scanningStatus').classList.remove('hidden');
+    document.getElementById('scanSuccess').classList.add('hidden');
+    document.getElementById('scanProgress').style.width = '0%';
+    
+    // Animate progress
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+        progress += 3;
+        document.getElementById('scanProgress').style.width = progress + '%';
+        
+        if (progress >= 100) {
+            clearInterval(progressInterval);
+        }
+    }, 90);
+    
+    // Show success after 3 seconds
+    setTimeout(() => {
+        document.getElementById('scanningAnimation').classList.add('hidden');
+        document.getElementById('scanningStatus').classList.add('hidden');
+        document.getElementById('scanSuccess').classList.remove('hidden');
+        
+        // Update project status
+        const project = db.getProjectById(projectId);
+        if (project) {
+            project.status = 'milestone_complete';
+            db.updateProject(project);
+            loadActiveProjects();
+        }
+    }, 3000);
+}
 
-    // 2. STANDARD USER SIGNUP (Triggers Email)
-    const signupForm = document.getElementById('signupForm');
-    if (signupForm && supabase) {
-        signupForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            const companyName = document.getElementById('signupCompany').value.trim();
-            const btn = document.getElementById('signupSubmitBtn');
-            
-            btn.innerHTML = 'Creating account...';
-            
-            const { data, error } = await supabase.auth.signUp({
-                email: email,
-                password: password,
-                options: { data: { companyName: companyName } }
-            });
-            
-            if (error) {
-                alert('Signup Failed: ' + error.message);
-                btn.innerHTML = 'Create Account';
-                return;
-            }
-            
-            alert('Account created successfully! Please check your email to verify your address before logging in.');
-            document.getElementById('signupModal').classList.remove('active');
-            btn.innerHTML = 'Create Account';
-        });
-    }
+function loadActiveProjects() {
+    const container = document.getElementById('activeProjects');
+    if (!container) return;
+    
+    const projects = db.getUserProjects(db.currentUser?.id || 1);
+    
+    container.innerHTML = projects.map(project => `
+        <div class="card p-4">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <h4 class="font-semibold text-lg">${project.title}</h4>
+                    <p class="text-sm text-gray-400">${t('budget')}: ${formatCurrency(project.budget)}</p>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs ${
+                    project.status === 'in_progress' ? 'bg-green-500/20 text-green-400' :
+                    project.status === 'milestone_complete' ? 'bg-[#FFD700]/20 text-[#FFD700]' :
+                    'bg-blue-500/20 text-blue-400'
+                }">${project.status.replace('_', ' ')}</span>
+            </div>
+            <div class="mb-3">
+                <div class="flex justify-between text-sm mb-1">
+                    <span class="text-gray-400">${t('progress')}</span>
+                    <span class="text-[#FFD700]">${project.progress || 0}%</span>
+                </div>
+                <div class="w-full bg-[#0f172a] rounded-full h-2">
+                    <div class="h-full bg-gradient-to-r from-[#FFD700] to-[#E6C200] rounded-full transition-all" style="width: ${project.progress || 0}%"></div>
+                </div>
+            </div>
+            <div class="flex justify-between items-center">
+                <div class="text-sm">
+                    <span class="text-gray-400">${t('released')}: </span>
+                    <span class="text-green-400 font-semibold">${formatCurrency(project.escrowReleased || 0)}</span>
+                    <span class="text-gray-500"> / ${formatCurrency(project.escrowTotal || project.budget)}</span>
+                </div>
+                ${project.status !== 'milestone_complete' ? `
+                    <button onclick="initiateLiDARScan(${project.id})" class="btn-primary px-4 py-2 rounded-lg text-sm flex items-center">
+                        <i class="fas fa-cube mr-2"></i>${t('initiate_lidar_scan')}
+                    </button>
+                ` : `
+                    <span class="text-green-400 text-sm flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>${t('milestone_complete')}
+                    </span>
+                `}
+            </div>
+        </div>
+    `).join('');
+}
 
-    // 3. STRICT ADMIN 2-STEP AUTHENTICATION (For admin.html)
-    const adminCredentialsForm = document.getElementById('adminCredentialsForm');
-    const adminOtpForm = document.getElementById('adminOtpForm');
+// ===== FEATURE 4: Circular Eco-Loop =====
+function acceptEcoRoute(matchId) {
+    showNotification(t('eco_route_accepted'));
+    
+    // Animate the card disappearing
+    const card = event.target.closest('.card');
+    card.style.transition = 'all 0.5s ease';
+    card.style.opacity = '0';
+    card.style.transform = 'translateX(100%)';
+    
+    setTimeout(() => {
+        card.remove();
+        
+        // Check if no more matches
+        const container = document.getElementById('ecoLoopMatches');
+        if (container && container.children.length === 0) {
+            container.innerHTML = `
+                <div class="col-span-2 text-center py-12">
+                    <i class="fas fa-check-circle text-green-500 text-4xl mb-4"></i>
+                    <p class="text-gray-400" data-i18n="all_routes_accepted">All Eco-Loop routes accepted!</p>
+                </div>
+            `;
+        }
+    }, 500);
+}
 
-    // Step 1: Check master password & email the code
-    if (adminCredentialsForm && supabase) {
-        adminCredentialsForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const email = document.getElementById('adminEmail').value.trim();
-            const password = document.getElementById('adminPassword').value;
-            const btn = document.getElementById('adminLoginBtn');
-
-            // Hardcoded security check
-            if (email !== 'techyguysam@gmail.com' || password !== 'SamKayBx007$') {
-                alert('Access Denied: Invalid Master Credentials.');
-                return;
-            }
-
-            btn.innerHTML = 'Sending Auth Code...';
-
-            const { error } = await supabase.auth.signInWithOtp({ email: email });
-
-            if (error) {
-                alert('Error sending code: ' + error.message);
-                btn.innerHTML = 'Verify Credentials';
-                return;
-            }
-
-            // Switch to OTP view
-            adminCredentialsForm.style.display = 'none';
-            adminOtpForm.style.display = 'block';
-        });
-    }
-
-    // Step 2: Verify the emailed code and unlock dashboard
-    if (adminOtpForm && supabase) {
-        adminOtpForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const otp = document.getElementById('adminOtpCode').value.trim();
-            const email = document.getElementById('adminEmail').value.trim();
-            const btn = document.getElementById('adminOtpBtn');
-
-            btn.innerHTML = 'Verifying...';
-
-            const { data, error } = await supabase.auth.verifyOtp({
-                email: email,
-                token: otp,
-                type: 'email'
-            });
-
-            if (error) {
-                alert('Invalid Security Code: ' + error.message);
-                btn.innerHTML = 'Authenticate & Enter';
-                return;
-            }
-
-            // Unlock the portal
-            document.getElementById('adminLoginOverlay').style.display = 'none';
-        });
-    }
-});
+// Export new feature functions
+window.activateTradeBrainVoice = activateTradeBrainVoice;
+window.initiateLiDARScan = initiateLiDARScan;
+window.acceptEcoRoute = acceptEcoRoute;
+window.loadActiveProjects = loadActiveProjects;
