@@ -1,10 +1,7 @@
 // BuildCrex - Main JavaScript File
 // Full-Stack Implementation with Supabase Auth, Localization, Tax Handling, Offline Support, and Admin Features
 
-// ===== SUPABASE AUTHENTICATION =====
-const SUPABASE_URL = 'https://rclvilcwfnwuicmtwmiw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjbHZpbGN3Zm53dWljbXR3bWl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njg5OTgsImV4cCI6MjA4NzM0NDk5OH0.-nUmlb2MHJ7neMD_U1iiClYUoAw4horRkw3mYCUKwtI';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 
 // Current authenticated user
 let currentAuthUser = null;
@@ -2844,3 +2841,114 @@ window.activateTradeBrainVoice = activateTradeBrainVoice;
 window.initiateLiDARScan = initiateLiDARScan;
 window.acceptEcoRoute = acceptEcoRoute;
 window.loadActiveProjects = loadActiveProjects;
+
+// ==========================================
+// REAL SUPABASE AUTHENTICATION & ADMIN SECRETS
+// ==========================================
+const SUPABASE_URL = 'https://rclvilcwfnwuicmtwmiw.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjbHZpbGN3Zm53dWljbXR3bWl3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3Njg5OTgsImV4cCI6MjA4NzM0NDk5OH0.-nUmlb2MHJ7neMD_U1iiClYUoAw4horRkw3mYCUKwtI';
+
+let supabaseClient;
+if (window.supabase) {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} else {
+    console.error("Supabase script missing from HTML head!");
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. STANDARD USER LOGIN
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm && supabaseClient) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginSubmitBtn');
+            btn.innerHTML = 'Logging in...';
+            
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                if (error.message.includes('Email not confirmed')) alert('Please check your email and verify your account first.');
+                else alert('Login Failed: ' + error.message);
+                btn.innerHTML = 'Login';
+                return;
+            }
+            window.location.href = 'dashboard.html';
+        });
+    }
+
+    // 2. STANDARD USER SIGNUP
+    const signupForm = document.getElementById('signupForm');
+    if (signupForm && supabaseClient) {
+        signupForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            const companyName = document.getElementById('signupCompany').value.trim();
+            const btn = document.getElementById('signupSubmitBtn');
+            btn.innerHTML = 'Creating account...';
+            
+            const { error } = await supabaseClient.auth.signUp({
+                email: email, password: password, options: { data: { companyName: companyName } }
+            });
+            
+            if (error) {
+                alert('Signup Failed: ' + error.message);
+                btn.innerHTML = 'Create Account';
+                return;
+            }
+            alert('Account created successfully! Please check your email to verify your address before logging in.');
+            document.getElementById('signupModal').classList.remove('active');
+            btn.innerHTML = 'Create Account';
+        });
+    }
+
+    // 3. STRICT ADMIN 2-STEP AUTHENTICATION
+    const adminCredentialsForm = document.getElementById('adminCredentialsForm');
+    const adminOtpForm = document.getElementById('adminOtpForm');
+
+    if (adminCredentialsForm && supabaseClient) {
+        adminCredentialsForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            const btn = document.getElementById('adminLoginBtn');
+
+            if (email !== 'techyguysam@gmail.com' || password !== 'SamKayBx007$') {
+                alert('Access Denied: Invalid Master Credentials.');
+                return;
+            }
+
+            btn.innerHTML = 'Sending Auth Code...';
+            const { error } = await supabaseClient.auth.signInWithOtp({ email: email });
+
+            if (error) {
+                alert('Error sending code: ' + error.message);
+                btn.innerHTML = 'Verify Credentials';
+                return;
+            }
+            adminCredentialsForm.style.display = 'none';
+            adminOtpForm.style.display = 'block';
+        });
+    }
+
+    if (adminOtpForm && supabaseClient) {
+        adminOtpForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const otp = document.getElementById('adminOtpCode').value.trim();
+            const email = document.getElementById('adminEmail').value.trim();
+            const btn = document.getElementById('adminOtpBtn');
+
+            btn.innerHTML = 'Verifying...';
+            const { error } = await supabaseClient.auth.verifyOtp({ email: email, token: otp, type: 'email' });
+
+            if (error) {
+                alert('Invalid Security Code: ' + error.message);
+                btn.innerHTML = 'Authenticate & Enter';
+                return;
+            }
+            document.getElementById('adminLoginOverlay').style.display = 'none';
+        });
+    }
+});
