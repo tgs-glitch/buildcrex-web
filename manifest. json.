@@ -1,0 +1,22 @@
+{
+  "name": "BuildCrex Marketplace",
+  "short_name": "BuildCrex",
+  "description": "Canada's premier construction compliance marketplace.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#1a2744",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "./resources/buildcrex-logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "./resources/buildcrex-logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
